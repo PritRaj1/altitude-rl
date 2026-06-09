@@ -15,6 +15,7 @@
         buildInputs = with pkgs; [
           gcc
           gnumake
+          clang-tools
         ];
 
         shellHook = ''
