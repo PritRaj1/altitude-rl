@@ -35,6 +35,7 @@ double CascadedController::action(const LanderState& state) {
 
     // Outer guidance loop (altitude -> velocity)
     double err = target - state.velocity;
-    double thrust = pid(err, dt);
-    return thrust;
+    double pid_force = pid(err, dt);
+    double total_thrust = state.weight + pid_force;
+    return total_thrust;
 }

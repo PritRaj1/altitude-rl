@@ -17,12 +17,12 @@ private:
     double Kd_vel;
     
     // Inner Loop PID: corrects velocity
-    double prev_err;
     double acc_err;
     bool first_run;
     double pid(double err, double dt);
 
 public:
+    double prev_err;
     CascadedController(double target, double p_gain, double i_gain, double d_gain);
     double action(const LanderState& state) override;
 };

@@ -20,13 +20,14 @@ int main() {
 
         cout << "Altitude: " << fixed << next_state.altitude << " m\t"
                   << "Velocity: " << next_state.velocity << " m/s\t"
-                  << "Fuel: " << next_state.fuel << " kg\n";
+                  << "Fuel: " << next_state.fuel << " kg\t"
+                  << "Thrust: " << thrust << " N\n";
 
         this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     LanderState state = env.get_state();
-    if (state.velocity < 5.0) {
+    if (abs(state.velocity) < 5.0) {
         cout << "Safe landing at: " << state.velocity << " m/s\n";
     } else {
         cout << "Crash landed at: " << state.velocity << " m/s\n";

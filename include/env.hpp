@@ -4,8 +4,9 @@ struct LanderState {
   double altitude = 100.0;
   double velocity = -50.0;
   double mass = 800.0;
-  double fuel = 200.0;
+  double fuel = 300.0;
   double thrust = 0.0;
+  double weight = 800.0;
 };
 
 class MarsLanderEnv {
