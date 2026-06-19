@@ -20,8 +20,27 @@ int main() {
   const double dt = 0.1;
 
   while (lander.altitude > 0.0) {
-    lander.velocity += MARS_G * dt;
+    if (lander.altitude < 500.0 && lander.fuel > 0.0) {
+      lander.thrust = 7000.0; // Engines firing
+    } else {
+      lander.thrust = 0.0; // Engines idle
+    }
+    double fuel_needed = lander.thrust * FUEL_BURN_RATE * dt;
+    if (fuel_needed > lander.fuel) {
+      fuel_needed = lander.fuel;
+      lander.thrust = fuel_needed / (FUEL_BURN_RATE * dt);
+    }
+    lander.fuel -= fuel_needed;
+
+    double total_mass = lander.mass + lander.fuel;
+    double acceleration = (lander.thrust / total_mass) + MARS_G;
+
+    lander.velocity += acceleration * dt;
     lander.altitude += lander.velocity * dt;
+
+    if (lander.altitude < 0.0) {
+      lander.altitude = 0.0;
+    }
 
     cout << "Altitude: " << fixed << lander.altitude << "m\t"
          << "Velocity: " << lander.velocity << "m/s\n";
@@ -29,5 +48,11 @@ int main() {
   }
 
   cout << "Final Impact Velocity: " << lander.velocity << " m/s\n";
+  if (abs(lander.velocity) < 5.0) {
+    cout << "Safe landing at " << lander.velocity << " m/s\n";
+  } else {
+    cout << "Crashed at " << lander.velocity << " m/s\n";
+  }
+
   return 0;
 }
