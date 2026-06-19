@@ -12,11 +12,28 @@
       pkgs = nixpkgs.legacyPackages.${system};
     in
     {
+      packages.${system}.default = pkgs.stdenv.mkDerivation {
+        pname = "mars-lander";
+        version = "0.1.0";
+
+        src = ./.;
+
+        nativeBuildInputs = with pkgs; [
+          cmake
+          ninja
+        ];
+
+        cmakeGenerator = "Ninja";
+      };
+
       devShells.${system}.default = pkgs.mkShell {
-        buildInputs = with pkgs; [
+        packages = with pkgs; [
           gcc
-          gnumake
+          cmake
+          ninja
           clang-tools
+          cmake-format
+
           python3
           python3Packages.jupyterlab
           python3Packages.numpy
@@ -28,6 +45,7 @@
           echo "Entered dev environment"
         '';
       };
+
       formatter.${system} = pkgs.nixfmt;
     };
 }
