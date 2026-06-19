@@ -1,5 +1,6 @@
 #include "env.hpp"
 #include "control.hpp"
+#include "utils.hpp"
 
 #include <iostream>
 #include <chrono>
@@ -18,9 +19,8 @@ int main() {
         env.step(thrust);
         LanderState next_state = env.get_state();
 
-        cout << "Altitude: " << fixed << next_state.altitude << " m\t"
-                  << "Velocity: " << next_state.velocity << " m/s\t"
-                  << "Fuel: " << next_state.fuel << " kg\n";
+        cout << "\033[2J\033[1;1H";
+        draw_lander(next_state.altitude, thrust, env.MAX_THRUST);
 
         this_thread::sleep_for(std::chrono::milliseconds(50));
     }
