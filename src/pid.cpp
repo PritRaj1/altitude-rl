@@ -5,8 +5,8 @@
 
 using namespace std;
 
-CascadedController::CascadedController(double p_gain, double i_gain, double d_gain) 
-    : Kp_vel(p_gain), Ki_vel(i_gain), Kd_vel(d_gain), 
+CascadedController::CascadedController(double target, double p_gain, double i_gain, double d_gain) 
+    : target(target), Kp_vel(p_gain), Ki_vel(i_gain), Kd_vel(d_gain), 
       prev_err(0.0), acc_err(0.0), first_run(true) {}
 
 // Inner PID loop to zero velocity error
@@ -34,9 +34,6 @@ double CascadedController::action(const LanderState& state) {
     const double dt = 0.1;
 
     // Outer guidance loop (altitude -> velocity)
-    double target = -0.5 * sqrt(max(0.0, state.altitude));
-    if (target > -2.0) target = -2.0;
-
     double err = target - state.velocity;
     double thrust = pid(err, dt);
     return thrust;

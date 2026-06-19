@@ -10,7 +10,7 @@ using namespace std;
 
 int main() {
     MarsLanderEnv env;
-    CascadedController controller(0.8, 0.1, 0.3);
+    CascadedController controller(0.0, 0.8, 0.1, 0.3);
 
     while (!env.is_terminal()) {
         LanderState current_state = env.get_state();

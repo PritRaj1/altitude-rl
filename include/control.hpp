@@ -9,6 +9,8 @@ public:
 
 class CascadedController : public ThrustController {
 private:
+    double target;
+
     // Gains
     double Kp_vel;
     double Ki_vel;
@@ -21,6 +23,6 @@ private:
     double pid(double err, double dt);
 
 public:
-    CascadedController(double p_gain, double i_gain, double d_gain);
+    CascadedController(double target, double p_gain, double i_gain, double d_gain);
     double action(const LanderState& state) override;
 };
