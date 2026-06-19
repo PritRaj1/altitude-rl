@@ -2,7 +2,7 @@
 
 struct LanderState {
   double altitude = 100.0;
-  double velocity = 10.0;
+  double velocity = 0.0;
   double fuel = 2000.0;
   double thrust = 0.0;
   double weight = 500.0;
@@ -18,10 +18,10 @@ private:
     const double MAX_THRUST = 12000.0;
     const double FUEL_BURN_RATE = 0.005;
     const double MARS_AIR_DENSITY = 0.02;
-    const double dt = 0.1;
 
 public:
     MarsLanderEnv() = default;
+    const double dt = 0.1;
     
     void reset();
     LanderState get_state() const;
