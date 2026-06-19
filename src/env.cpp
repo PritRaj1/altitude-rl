@@ -6,7 +6,10 @@
 using namespace std;
 
 void MarsLanderEnv::reset() {
-    state = LanderState();
+    state.altitude = 1000.0;
+    state.velocity = 0.0;
+    state.fuel = 300.0;
+    state.thrust = 0.0; 
 }
 
 LanderState MarsLanderEnv::get_state() const { 
@@ -18,7 +21,8 @@ bool MarsLanderEnv::is_terminal() const {
 }
 
 void MarsLanderEnv::step(double thrust_action) {
-    state.weight = state.mass * -MARS_G;
+    double total_mass = state.mass + state.fuel;
+    state.weight = total_mass * abs(MARS_G);
     state.thrust = max(0.0, min(thrust_action, MAX_THRUST));
 
     double fuel_needed = state.thrust * FUEL_BURN_RATE * dt;
@@ -28,8 +32,9 @@ void MarsLanderEnv::step(double thrust_action) {
     }
     state.fuel -= fuel_needed;
 
-    double total_mass = state.mass + state.fuel;
-    double acceleration = (state.thrust / total_mass) + MARS_G;
+    double drag_magnitude = 0.5 * MARS_AIR_DENSITY * (state.velocity * state.velocity) * state.drag_coeff * state.area_cross_section;
+    double drag_force = (state.velocity > 0.0) ? -drag_magnitude : drag_magnitude;
+    double acceleration = ((state.thrust + drag_force) / total_mass) + MARS_G;
 
     state.velocity += acceleration * dt;
     state.altitude += state.velocity * dt;
