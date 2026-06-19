@@ -1,58 +1,25 @@
-#include <chrono>
+#include "env.hpp"
 #include <iostream>
+#include <chrono>
 #include <thread>
+#include <cmath>
 
 using namespace std;
 
-struct LanderState {
-  double altitude = 100.0;
-  double velocity = -50.0;
-  const double mass = 800.0;
-  double fuel = 200.0;
-  double thrust = 0.0;
-};
-
 int main() {
-  LanderState lander;
-  const double MARS_G = -3.71;
-  const double MAX_THRUST = 12000.0;
-  const double FUEL_BURN_RATE = 0.05;
-  const double dt = 0.1;
+    MarsLanderEnv env;
 
-  while (lander.altitude > 0.0) {
-    if (lander.altitude < 500.0 && lander.fuel > 0.0) {
-      lander.thrust = 7000.0; // Engines firing
-    } else {
-      lander.thrust = 0.0; // Engines idle
-    }
-    double fuel_needed = lander.thrust * FUEL_BURN_RATE * dt;
-    if (fuel_needed > lander.fuel) {
-      fuel_needed = lander.fuel;
-      lander.thrust = fuel_needed / (FUEL_BURN_RATE * dt);
-    }
-    lander.fuel -= fuel_needed;
+    while (!env.is_terminal()) {
+        LanderState current_state = env.get_state();
+        env.step(0.0);
+        LanderState next_state = env.get_state();
 
-    double total_mass = lander.mass + lander.fuel;
-    double acceleration = (lander.thrust / total_mass) + MARS_G;
+        std::cout << "Altitude: " << std::fixed << next_state.altitude << " m\t"
+                  << "Velocity: " << next_state.velocity << " m/s\t"
+                  << "Fuel: " << next_state.fuel << " kg\n";
 
-    lander.velocity += acceleration * dt;
-    lander.altitude += lander.velocity * dt;
-
-    if (lander.altitude < 0.0) {
-      lander.altitude = 0.0;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
-    cout << "Altitude: " << fixed << lander.altitude << "m\t"
-         << "Velocity: " << lander.velocity << "m/s\n";
-    this_thread::sleep_for(chrono::milliseconds(100));
-  }
-
-  cout << "Final Impact Velocity: " << lander.velocity << " m/s\n";
-  if (abs(lander.velocity) < 5.0) {
-    cout << "Safe landing at " << lander.velocity << " m/s\n";
-  } else {
-    cout << "Crashed at " << lander.velocity << " m/s\n";
-  }
-
-  return 0;
+    return 0;
 }
