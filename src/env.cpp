@@ -22,7 +22,6 @@ bool MarsLanderEnv::is_terminal() const {
 
 void MarsLanderEnv::step(double thrust_action) {
     double total_mass = state.mass + state.fuel;
-    state.weight = total_mass * abs(MARS_G);
     state.thrust = max(0.0, min(thrust_action, MAX_THRUST));
 
     double fuel_needed = state.thrust * FUEL_BURN_RATE * dt;

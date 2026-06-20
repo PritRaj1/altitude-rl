@@ -1,0 +1,47 @@
+#pragma once
+#include "env.hpp"
+
+#include <vector>
+#include <map>
+#include <memory>
+
+using namespace std;
+
+enum class TDType {
+    QLearning,
+    SARSA
+};
+
+
+class Agent {
+    private:
+        double alpha;
+        double gamma;
+        double epsilon;
+
+        vector<double> action_space; // Discretised thrusts 
+        vector<double> q_table; // Index by [alt_idx * (NUM_VEL * NUM_ACT) + vel_idx * NUM_ACT + action_idx]
+
+        // Discretisation
+        const int NUM_ACTIONS = 5;
+        const double MAX_ALTITUDE = 150;
+        const double dALT = 5.0; // Bucket size
+        const int NUM_ALT_BUCKETS = static_cast<int>(MAX_ALTITUDE / dALT) + 1;
+        const double MIN_V = -100.0;
+        const double MAX_V = 100.0;
+        const double dV = 1.0; // Bucket size
+        const int NUM_VEL_BUCKETS = static_cast<int>((MAX_V - MIN_V) / dV) + 1;
+
+        int get_alt_idx(double altitude) const;
+        int get_vel_idx(double velocity) const;
+        int get_q_idx(int alt_idx, int vel_idx, int action_idx) const;
+
+    public:
+        Agent(double alpha, double gamma, double epsilon, const MarsLanderEnv& env);
+        ~Agent() = default;
+
+        int choose_action(const LanderState& state);
+        double get_thrust(int action_idx) const;
+        void update(TDType type, const LanderState& state, int action_idx, double reward, const LanderState& next_state, int next_action_idx);
+        void decay_epsilon(double factor);
+}
