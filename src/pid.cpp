@@ -42,6 +42,10 @@ double CascadedController::action(const LanderState& state) {
     
     double current_weight = (env.DRY_MASS + state.fuel) * env.MARS_G;
     double total_thrust = current_weight + pid_force;
+
+    if (state.fuel <= 0.0) {
+        total_thrust = 0.0;
+    }
     
     return total_thrust;
 }
