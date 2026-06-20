@@ -1,27 +1,31 @@
 #include "env.hpp"
 #include "agent.hpp"
+#include "utils.hpp"
 
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
+#include <thread>
+#include <chrono>
 
 using namespace std;
 
-void train_agent(TDtype type, const string& filename, int num_episodes = 100000) {
+vector<double> train_agent(TDtype type, const string& filename, int num_episodes = 1500000) {
     ofstream csv_file(filename);
     csv_file << "seed,episode,reward,velocity\n";
 
     string run_name = (type == TDtype::QLearning) ? "Q-Learning" : "SARSA";
     cout << "Starting training: " << run_name << "\n";
 
-    const int EVAL_INTERVAL = 500;
+    const int EVAL_INTERVAL = 100000;
     vector<int> seeds = {42, 1337, 2026, 999, 7};
 
+    vector<double> trained_weights;
     for (int seed : seeds) {
         srand(seed);
         MarsLanderEnv env;
-        Agent agent(0.1, 0.9999, 1.0, env);
+        Agent agent(0.01, 1.0, 1.0, env);
 
         for (int ep = 0; ep < num_episodes; ++ep) {
             
@@ -59,15 +63,52 @@ void train_agent(TDtype type, const string& filename, int num_episodes = 100000)
                 state = next_state;
                 action = next_action;
             }
-            agent.decay_epsilon(0.9999);
+            agent.decay_epsilon(0.999);
         }
         cout << "  -> Finished tracking Seed [" << seed << "]\n";
+        trained_weights = agent.get_q_table();
     }
     cout << "Finished all seeds for " << run_name << ". Output to " << filename << "\n\n";
+    return trained_weights;
+}
+
+void run(vector<double>& weights) {
+    MarsLanderEnv env;
+    LanderState state = env.get_state();
+    Agent agent(0.01, 1.0, 1.0, env);
+    agent.set_q_table(weights);
+
+    while (!env.is_terminal()) {
+        int action = agent.choose_action(state, true); 
+        double thrust = agent.get_thrust(action);
+        draw_lander(state.altitude, thrust, env.MAX_THRUST);
+        this_thread::sleep_for(chrono::milliseconds(50));
+        env.step(thrust);
+        state = env.get_state();
+    }
+
+    if (abs(state.velocity) < 5.0) {
+        cout << "Safe landing at: " << state.velocity << " m/s\n";
+    } else {
+        cout << "Crash landed at: " << state.velocity << " m/s\n";
+    }
 }
 
 int main() {
-    train_agent(TDtype::QLearning, "q_learning_curves.csv");
-    train_agent(TDtype::SARSA, "sarsa_learning_curves.csv");
+    vector<double> q_learned = train_agent(TDtype::QLearning, "q_learning_curves.csv");
+    vector<double> sarsa = train_agent(TDtype::SARSA, "sarsa_learning_curves.csv");
+
+    cout << "Press [ENTER] for Q-learning sim\n";
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.get();
+    run(q_learned);
+
+    cout << "\n\nPress [ENTER] for SARSA sim\n";
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.get();
+    run(sarsa);
+
     return 0;
 }

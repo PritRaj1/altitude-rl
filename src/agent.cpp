@@ -87,5 +87,13 @@ void Agent::update(TDtype type, const LanderState& state, int action_idx, double
 }
 
 void Agent::decay_epsilon(double factor) {
-    epsilon = max(0.01, epsilon * factor);
+    epsilon = max(0.1, epsilon * factor);
+}
+
+void Agent::set_q_table(const vector<double>& new_table) {
+    q_table = new_table;
+}
+
+vector<double> Agent::get_q_table() const {
+    return q_table;
 }

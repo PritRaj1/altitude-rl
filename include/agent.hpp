@@ -24,12 +24,12 @@ class Agent {
 
         // Discretisation
         const int NUM_ACTIONS = 100;
-        const double MAX_ALTITUDE = 500;
-        const double dALT = 1.0; // Bucket size
+        const double MAX_ALTITUDE = 200;
+        const double dALT = 5.0; // Bucket size
         const int NUM_ALT_BUCKETS = static_cast<int>(MAX_ALTITUDE / dALT) + 1;
-        const double MIN_VEL = -100.0;
+        const double MIN_VEL = -50.0;
         const double MAX_VEL = 10.0;
-        const double dVEL = 0.1; // Bucket size
+        const double dVEL = 1.0; // Bucket size
         const int NUM_VEL_BUCKETS = static_cast<int>((MAX_VEL - MIN_VEL) / dVEL) + 1;
 
         int get_alt_idx(double altitude) const;
@@ -44,4 +44,6 @@ class Agent {
         double get_thrust(int action_idx) const;
         void update(TDtype type, const LanderState& state, int action_idx, double reward, const LanderState& next_state, int next_action_idx);
         void decay_epsilon(double factor);
+        void set_q_table(const vector<double>& new_table);
+        vector<double> get_q_table() const;
 };
