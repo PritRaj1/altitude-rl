@@ -40,7 +40,7 @@ class Agent {
         Agent(double alpha, double gamma, double epsilon, const MarsLanderEnv& env);
         ~Agent() = default;
 
-        int choose_action(const LanderState& state);
+        int choose_action(const LanderState& state, bool eval = false);
         double get_thrust(int action_idx) const;
         void update(TDtype type, const LanderState& state, int action_idx, double reward, const LanderState& next_state, int next_action_idx);
         void decay_epsilon(double factor);

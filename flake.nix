@@ -39,6 +39,7 @@
           python3Packages.numpy
           python3Packages.matplotlib
           python3Packages.pandas
+          python3Packages.seaborn
           python3Packages.ruff
         ];
 

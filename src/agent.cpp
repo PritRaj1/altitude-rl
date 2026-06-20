@@ -39,8 +39,8 @@ double Agent::get_thrust(int action_idx) const {
 }
 
 // Epsilon-greedy choice
-int Agent::choose_action(const LanderState& state) {
-    if ((static_cast<double>(rand()) / RAND_MAX) < epsilon) {
+int Agent::choose_action(const LanderState& state, bool eval) {
+    if (!eval && (static_cast<double>(rand()) / RAND_MAX) < epsilon) {
         return rand() % NUM_ACTIONS; // explore
     }
 
