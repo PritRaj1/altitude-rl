@@ -21,7 +21,7 @@ bool MarsLanderEnv::is_terminal() const {
 }
 
 void MarsLanderEnv::step(double thrust_action) {
-    double total_mass = state.mass + state.fuel;
+    double total_mass = DRY_MASS + state.fuel;
     state.thrust = max(0.0, min(thrust_action, MAX_THRUST));
 
     double fuel_needed = state.thrust * FUEL_BURN_RATE * dt;
@@ -31,7 +31,7 @@ void MarsLanderEnv::step(double thrust_action) {
     }
     state.fuel -= fuel_needed;
 
-    double drag_magnitude = 0.5 * MARS_AIR_DENSITY * (state.velocity * state.velocity) * state.drag_coeff * state.area_cross_section;
+    double drag_magnitude = 0.5 * MARS_AIR_DENSITY * (state.velocity * state.velocity) * DRAG_COEFF * AREA_CROSS_SECTION;
     double drag_force = (state.velocity > 0.0) ? -drag_magnitude : drag_magnitude;
     double acceleration = ((state.thrust + drag_force) / total_mass) + MARS_G;
 
@@ -41,4 +41,34 @@ void MarsLanderEnv::step(double thrust_action) {
     if (state.altitude < 0.0) {
         state.altitude = 0.0;
     }
+}
+
+double MarsLanderEnv::calculate_reward(double thrust) const {
+    double reward = -0.1; // Init -ve to incentivise fast landing
+
+    double fuel_penalty = -0.2 * (thrust / MAX_THRUST);
+    reward += fuel_penalty;
+
+    if (state.altitude > 0.0) {
+        if (state.altitude < 30.0) {
+            if (state.velocity < -4.0) {
+                reward -= abs(state.velocity) * 0.5; // Penalise large -ve velocity at low altitudes
+            }
+        } else {
+            if (state.velocity < -20.0) {
+                reward -= 1.0;
+            }
+        }
+    }
+
+    if (is_terminal() && state.altitude <= 0.0) {
+        if (state.velocity >= -3.0 && state.velocity <= 0.1) {
+            reward += 500.0; // safe touchdown
+            reward += (state.fuel * 0.1); // fuel to space 
+        } else {
+            reward -= 500.0 + (abs(state.velocity) * 10.0);
+        }
+    }
+
+    return reward;
 }

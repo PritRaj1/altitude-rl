@@ -5,9 +5,17 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-file(GLOB_RECURSE SOURCES "src/*.cpp")
-file(GLOB_RECURSE HEADERS "include/*.hpp")
+set(SOURCES
+    src/env.cpp
+    src/pid.cpp
+    src/agent.cpp
+    src/utils.cpp
+)
 
-add_executable(main ${SOURCES} ${HEADERS})
-target_include_directories(main PRIVATE include)
-install(TARGETS main DESTINATION bin)
+add_executable(pid src/main_pid.cpp ${SOURCES})
+target_include_directories(pid PRIVATE include)
+
+add_executable(td src/main_td.cpp ${SOURCES})
+target_include_directories(td PRIVATE include)
+
+install(TARGETS pid td DESTINATION bin)

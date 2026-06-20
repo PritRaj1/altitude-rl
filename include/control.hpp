@@ -10,7 +10,7 @@ public:
 class CascadedController : public ThrustController {
 private:
     double target;
-    double dt;
+    const MarsLanderEnv& env;
 
     // Gains
     double Kp_vel;
@@ -25,6 +25,6 @@ private:
 
 public:
     double prev_err;
-    CascadedController(double target, double p_gain, double i_gain, double d_gain, double p_gain_alt, double dt);
+    CascadedController(double target, double p_gain, double i_gain, double d_gain, double p_gain_alt, const MarsLanderEnv& env);
     double action(const LanderState& state) override;
 };

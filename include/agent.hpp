@@ -7,7 +7,7 @@
 
 using namespace std;
 
-enum class TDType {
+enum class TDtype {
     QLearning,
     SARSA
 };
@@ -27,10 +27,10 @@ class Agent {
         const double MAX_ALTITUDE = 150;
         const double dALT = 5.0; // Bucket size
         const int NUM_ALT_BUCKETS = static_cast<int>(MAX_ALTITUDE / dALT) + 1;
-        const double MIN_V = -100.0;
-        const double MAX_V = 100.0;
-        const double dV = 1.0; // Bucket size
-        const int NUM_VEL_BUCKETS = static_cast<int>((MAX_V - MIN_V) / dV) + 1;
+        const double MIN_VEL = -100.0;
+        const double MAX_VEL = 100.0;
+        const double dVEL = 1.0; // Bucket size
+        const int NUM_VEL_BUCKETS = static_cast<int>((MAX_VEL - MIN_VEL) / dVEL) + 1;
 
         int get_alt_idx(double altitude) const;
         int get_vel_idx(double velocity) const;
@@ -42,6 +42,6 @@ class Agent {
 
         int choose_action(const LanderState& state);
         double get_thrust(int action_idx) const;
-        void update(TDType type, const LanderState& state, int action_idx, double reward, const LanderState& next_state, int next_action_idx);
+        void update(TDtype type, const LanderState& state, int action_idx, double reward, const LanderState& next_state, int next_action_idx);
         void decay_epsilon(double factor);
-}
+};
