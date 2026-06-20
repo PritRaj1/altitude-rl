@@ -6,12 +6,12 @@
 
 using namespace std;
 
-void train_agent(TDtype type, const string& filename, int num_episodes = 25000) {
+void train_agent(TDtype type, const string& filename, int num_episodes = 100000) {
     ofstream csv_file(filename);
     csv_file << "episode,reward,velocity\n";
 
     MarsLanderEnv env;
-    Agent agent(0.05, 0.99, 1.0, env);
+    Agent agent(0.001, 1.0, 0.95, env);
 
     string run_name = (type == TDtype::QLearning) ? "Q-Learning" : "SARSA";
     cout << "Starting training: " << run_name << "\n";
