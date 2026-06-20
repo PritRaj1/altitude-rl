@@ -23,9 +23,9 @@ class Agent {
         vector<double> q_table; // Index by [alt_idx * (NUM_VEL * NUM_ACT) + vel_idx * NUM_ACT + action_idx]
 
         // Discretisation
-        const int NUM_ACTIONS = 5;
-        const double MAX_ALTITUDE = 150;
-        const double dALT = 5.0; // Bucket size
+        const int NUM_ACTIONS = 100;
+        const double MAX_ALTITUDE = 100;
+        const double dALT = 1.0; // Bucket size
         const int NUM_ALT_BUCKETS = static_cast<int>(MAX_ALTITUDE / dALT) + 1;
         const double MIN_VEL = -100.0;
         const double MAX_VEL = 100.0;

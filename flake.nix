@@ -38,6 +38,7 @@
           python3Packages.jupyterlab
           python3Packages.numpy
           python3Packages.matplotlib
+          python3Packages.pandas
           python3Packages.ruff
         ];
 
