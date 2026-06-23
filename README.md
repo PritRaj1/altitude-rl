@@ -44,7 +44,7 @@ class ThreadSafeReplayBuffer {
 private:
   std::queue<Experience> buffer;
   std::mutex mtx;
-  std::condition_variable cv; // Prevents queue emptying to stop global optimizer until workers push experiences
+  std::condition_variable cv; // Freeze global optimizer until workers push experiences
   static constexpr size_t MAX_SIZE = 500;
 
 public:
