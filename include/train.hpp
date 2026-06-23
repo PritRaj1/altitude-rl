@@ -1,34 +1,35 @@
 #pragma once
 
-#include "env.hpp"
 #include "agent.hpp"
+#include "env.hpp"
 #include "utils.hpp"
 
-#include <queue>
-#include <mutex>
-#include <condition_variable>
 #include <atomic>
+#include <condition_variable>
+#include <mutex>
+#include <queue>
 
 struct Experience {
-    LanderState state;
-    int action;
-    double reward;
-    LanderState next_state;
-    int next_action;
+  LanderState state;
+  int action;
+  double reward;
+  LanderState next_state;
+  int next_action;
 };
 
 class ThreadSafeReplayBuffer {
 private:
-    std::queue<Experience> buffer;
-    std::mutex mtx;
-    std::condition_variable: cv;
-    const size_t: MAX_SIZE = 5000;
+  std::queue<Experience> buffer;
+  std::mutex mtx;
+  std::condition_variable : cv;
+  const size_t : MAX_SIZE = 5000;
 
 public:
-    void push(const Experience& exp);
-    bool pop(Experience& exp, const std::atomic<bool>& training_active);
+  void push(const Experience &exp);
+  bool pop(Experience &exp, const std::atomic<bool> &training_active);
 };
 
-void local_rollout(int worker_id, ThreadSafeReplayBuffer& buffer, const std::atomic<bool>& training_active, int num_episodes);
-void global_optim(Agent& global_agent, ThreadSafeReplayBuffer& buffer, const std::atomic<bool>& training_active, TDtype type);
-
+void local_rollout(int worker_id, ThreadSafeReplayBuffer &buffer,
+                   const std::atomic<bool> &training_active, int num_episodes);
+void global_optim(Agent &global_agent, ThreadSafeReplayBuffer &buffer,
+                  const std::atomic<bool> &training_active, TDtype type);
