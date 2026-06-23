@@ -25,10 +25,11 @@ private:
   static constexpr size_t MAX_SIZE = 500;
 
 public:
-  void push(const Experience &exp);
+  void push_batch(const std::vector<Experience> &batch,
+                  const std::atomic<bool> &training_active);
   bool pop(Experience &exp, const std::atomic<bool> &training_active);
+  void deactivate(std::atomic<bool> &training_active);
 };
-
 void local_rollout(int worker_id, ThreadSafeReplayBuffer &buffer,
                    const std::atomic<bool> &training_active, int num_episodes);
 void global_optim(Agent &global_agent, ThreadSafeReplayBuffer &buffer,

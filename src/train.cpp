@@ -4,14 +4,23 @@
 using namespace std;
 
 // Thread-safe queue for rollout experiences
-void ThreadSafeReplayBuffer::push(const Experience &item) {
-  lock_guard<mutex> lock(mtx);
-  if (buffer.size() >= MAX_SIZE) {
-    buffer.pop(); // rm oldest
+void ThreadSafeReplayBuffer::push_batch(const vector<Experience> &batch,
+                                        const atomic<bool> &training_active) {
+  unique_lock<mutex> lock(mtx);
+
+  for (const auto &item : batch) {
+    cv.wait(lock, [this, &training_active] {
+      return buffer.size() < MAX_SIZE ||
+             !training_active; // worker sleeps on full buffer
+    });
+
+    if (!training_active)
+      return;
+    buffer.push(item);
   }
-  buffer.push(item);
-  cv.notify_one();
-};
+
+  cv.notify_one(); // Wake up global optim as data batch ready
+}
 
 bool ThreadSafeReplayBuffer::pop(Experience &item,
                                  const atomic<bool> &training_active) {
@@ -28,14 +37,26 @@ bool ThreadSafeReplayBuffer::pop(Experience &item,
 
   item = buffer.front();
   buffer.pop();
+
+  cv.notify_all(); // Wake up workers, as space in queue freed
   return true;
-};
+}
+
+void ThreadSafeReplayBuffer::deactivate(atomic<bool> &training_active) {
+  lock_guard<mutex> lock(mtx);
+  training_active = false;
+  cv.notify_all();
+}
 
 void local_rollout(int worker_id, ThreadSafeReplayBuffer &buffer,
                    const atomic<bool> &training_active, int num_episodes) {
   srand(0 + worker_id);
   MarsLanderEnv env;
   Agent local_agent(0.01, 1.0, 1.0, env);
+
+  // Pre-allocate temporary cache on this thread
+  vector<Experience> local_batch;
+  local_batch.reserve(256);
 
   for (int ep = 0; ep < num_episodes && training_active.load(); ++ep) {
     env.reset();
@@ -50,17 +71,23 @@ void local_rollout(int worker_id, ThreadSafeReplayBuffer &buffer,
       double reward = env.calculate_reward(thrust);
       int next_action = local_agent.choose_action(next_state);
 
-      Experience item{state, action, reward, next_state, next_action};
-      buffer.push(item);
+      // Push to private local memory (Zero lock contention here!)
+      Experience item = {state, action, reward, next_state, next_action};
+      local_batch.push_back(item);
 
       state = next_state;
       action = next_action;
     }
     local_agent.decay_epsilon(0.999);
+
+    // Lock mutex and push to buffer
+    if (!local_batch.empty()) {
+      buffer.push_batch(local_batch, training_active);
+      local_batch.clear(); // Empty local cache for next ep
+    }
   }
 
   cout << "  [Thread " << worker_id << "] Finished.\n";
-  return;
 }
 
 void global_optim(Agent &global_agent, ThreadSafeReplayBuffer &buffer,
