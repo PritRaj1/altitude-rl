@@ -1,6 +1,6 @@
 # altitude-rl
 
-SARSA/Q-learning to guide a mars lander from 100 meters alititude to a soft touchdown.
+SARSA/Q-learning to guide a mars lander from 100 meters altitude to a soft touchdown.
 
 ## Multithreading
 
@@ -39,7 +39,7 @@ void global_optim(
 Threads are locked with `std::mutex` & `std::lock_guard` / `std::unique_lock` so only one worker can modify the shared queue's pointers at any instant:
 
 ```c++
-// tain.hpp
+// train.hpp
 class ThreadSafeReplayBuffer {
 private:
   std::queue<Experience> buffer;
