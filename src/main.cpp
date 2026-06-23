@@ -13,14 +13,14 @@ using namespace std;
 
 int main() {
   MarsLanderEnv env;
-  TDtype td_type = TDtype::QLearning;
+  TDtype td_type = TDtype::SARSA;
 
   Agent global_agent(0.01, 1.0, 1.0, env);
   ThreadSafeReplayBuffer replay_buffer;
   atomic<bool> training_active(true);
 
   const int NUM_THREADS = 4;
-  const int EPISODES_PER_WORKER = 1500000;
+  const int EPISODES_PER_WORKER = 100000;
 
   jthread learner_thread(global_optim, ref(global_agent), ref(replay_buffer),
                          ref(training_active), td_type);
@@ -48,7 +48,7 @@ int main() {
     int action = global_agent.choose_action(s, true); // true = pure greedy
     return global_agent.get_thrust(action);
   };
-  log2csv(rl_controller, "q_learning.csv");
+  log2csv(rl_controller, "sarsa.csv");
 
   cout << "Logged to q_learning.csv, starting PID.";
 
