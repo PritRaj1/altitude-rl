@@ -1,38 +1,43 @@
 #include "utils.hpp"
+#include "env.hpp"
+
+#include <fstream>
 #include <iostream>
 #include <string>
 
 using namespace std;
 
-void draw_lander(double altitude, double thrust, double max_thrust) {
-  const int MAX_HEIGHT_LINES = 20;
-  int lander_row = MAX_HEIGHT_LINES -
-                   static_cast<int>((altitude / 100.0) * MAX_HEIGHT_LINES);
+void log2csv(LanderController controller, const string &filename) {
+  cout << "Logging to " << filename << "\n";
+  ofstream csv_file(filename);
+  csv_file << "step,altitude,velocity,fuel,thrust,reward,is_terminal\n";
 
-  // Bounds check
-  if (lander_row < 0)
-    lander_row = 0;
-  if (lander_row >= MAX_HEIGHT_LINES)
-    lander_row = MAX_HEIGHT_LINES - 1;
+  MarsLanderEnv env;
+  env.reset();
+  LanderState state = env.get_state();
 
-  // Flames based on thrust effort
-  double throttle = thrust / max_thrust;
-  string flame = " ";
-  if (throttle > 0.1)
-    flame = "v";
-  if (throttle > 0.4)
-    flame = "▼";
-  if (throttle > 0.8)
-    flame = "█";
+  int step = 0;
+  double cumulative_reward = 0.0;
+  while (true) {
+    double thrust = controller(state);
+    double reward = env.calculate_reward(thrust);
+    cumulative_reward += reward;
+    bool terminal = env.is_terminal();
 
-  for (int i = 0; i < MAX_HEIGHT_LINES; ++i) {
-    if (i == lander_row) {
-      cout << "  [X]   <-- Lander\n";
-      cout << "   " << flame << " " << thrust << " N\n";
-    } else {
-      cout << "   | \n";
+    csv_file << step << "," << state.altitude << "," << state.velocity << ","
+             << state.fuel << "," << thrust << "," << reward << ","
+             << (terminal ? 1 : 0) << "\n";
+
+    if (terminal) {
+      break;
     }
+
+    env.step(thrust);
+    state = env.get_state();
+    step++;
   }
-  cout << "====== MARS SURFACE ======\n";
-  cout << "Altitude: " << fixed << altitude << " m\n\n";
-}
+
+  csv_file.close();
+  cout << "Finished logging:";
+  cout << "  Steps: " << step << " | Acc Reward: " << cumulative_reward << "\n";
+};

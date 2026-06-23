@@ -6,16 +6,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(SOURCES
+    src/agent.cpp
     src/env.cpp
     src/pid.cpp
-    src/agent.cpp
+    src/train.cpp
     src/utils.cpp
 )
 
-add_executable(pid src/main_pid.cpp ${SOURCES})
-target_include_directories(pid PRIVATE include)
+add_executable(main src/main.cpp ${SOURCES})
+target_include_directories(main PRIVATE include)
 
-add_executable(td src/main_td.cpp ${SOURCES})
-target_include_directories(td PRIVATE include)
-
-install(TARGETS pid td DESTINATION bin)
+install(TARGETS main DESTINATION bin)

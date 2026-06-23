@@ -21,8 +21,8 @@ class ThreadSafeReplayBuffer {
 private:
   std::queue<Experience> buffer;
   std::mutex mtx;
-  std::condition_variable : cv;
-  const size_t : MAX_SIZE = 5000;
+  std::condition_variable cv;
+  static constexpr size_t MAX_SIZE = 5000;
 
 public:
   void push(const Experience &exp);
