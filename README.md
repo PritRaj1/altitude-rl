@@ -1,14 +1,14 @@
-# altitude-sim
+# altitude-rl
 
-Concurrent C++ SARSA/Q-learning to guide a mars lander from 100 meters alititude to a soft touchdown.
+SARSA/Q-learning to guide a mars lander from 100 meters alititude to a soft touchdown.
 
-## Multithreading approach
+## Multithreading
 
 The approach is presented [here](https://arxiv.org/abs/1803.00933):
 
 ### Producer
 
-Runs trajectories within local environment with local agent choosing actions, pushing experiences to a thread-safe queue:
+Runs environmemts within with local agents choosing actions, pushing experiences to a thread-safe queue:
 
 ```c++
 // train.cpp
