@@ -25,7 +25,7 @@ double CascadedController::pid(double err) {
   double D = 0.0;
   if (!first_run) {
     double derivative = (err - prev_err) / env.dt;
-    D = Kd_vel * derivative;
+    D = -Kd_vel * derivative;
   } else {
     first_run = false;
   }
@@ -37,7 +37,7 @@ double CascadedController::pid(double err) {
 double CascadedController::action(const LanderState &state) {
 
   // Outer guidance loop (altitude -> velocity)
-  double command_velocity = Kp_alt * state.altitude;
+  double command_velocity = -Kp_alt * state.altitude;
   command_velocity = max(-20.0, min(command_velocity, target));
 
   double err = command_velocity - state.velocity;

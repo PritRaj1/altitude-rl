@@ -1,9 +1,9 @@
 #pragma once
 
 struct LanderState {
-  double altitude = 200.0;
+  double altitude = 100.0;
   double velocity = 0.0;
-  double fuel = 1000.0;
+  double fuel = 500.0;
   double thrust = 0.0;
 };
 

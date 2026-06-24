@@ -42,21 +42,20 @@ void MarsLanderEnv::step(double thrust) {
 }
 
 double MarsLanderEnv::calculate_reward(double thrust) const {
-  double reward = -0.1;
-  reward -= 0.1 * (thrust / MAX_THRUST);
-
-  if (state.altitude > 0.0) {
-    if (state.velocity < -8.0) {
-      reward -= 0.5;
-    }
-  }
-
   if (is_terminal()) {
-    if (state.velocity >= -3.0 && state.velocity <= 0.1) {
-      return 2000.0 + (state.fuel * 2.0);
+    if (state.velocity >= -5.0 && state.velocity <= 0.1) {
+      return 3000.0;
     } else {
-      return -500.0;
+      return -1500.0;
     }
   }
+
+  double reward = 5.0; // survival bonus, for to live is difficult
+
+  double ideal_velocity = -0.15 * state.altitude;
+  double velocity_error = abs(state.velocity - ideal_velocity);
+  reward -= 1.5 * velocity_error; // speed penalty
+
+  reward -= 0.005 * thrust; // fuel penalty
   return reward;
 }
