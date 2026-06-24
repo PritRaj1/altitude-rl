@@ -14,6 +14,7 @@ private:
   double alpha;
   double gamma;
   double epsilon;
+  double decay;
 
   vector<double> action_space; // Discretised thrusts
   vector<double> q_table; // Index by [alt_idx * (NUM_VEL * NUM_ACT) + vel_idx *
@@ -34,7 +35,8 @@ private:
   int get_q_idx(int alt_idx, int vel_idx, int action_idx) const;
 
 public:
-  Agent(double alpha, double gamma, double epsilon, const MarsLanderEnv &env);
+  Agent(double alpha, double gamma, double epsilon, double decay,
+        const MarsLanderEnv &env);
   ~Agent() = default;
 
   int choose_action(const LanderState &state, bool eval = false);
@@ -42,7 +44,8 @@ public:
   void update(TDtype type, const LanderState &state, int action_idx,
               double reward, const LanderState &next_state,
               int next_action_idx);
-  void decay_epsilon(double factor);
+  void decay_epsilon();
+  Agent clone() const;
   void sync_from(const Agent &other);
   void set_q_table(const vector<double> &new_table);
   vector<double> get_q_table() const;

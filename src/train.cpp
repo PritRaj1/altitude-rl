@@ -53,7 +53,7 @@ void local_rollout(int worker_id, ThreadSafeReplayBuffer &buffer,
                    int num_episodes) {
   srand(0 + worker_id);
   MarsLanderEnv env;
-  Agent local_agent(0.001, 1.0, 1.0, env);
+  Agent local_agent = global_agent.clone();
 
   // Pre-allocate temporary cache on this thread
   vector<Experience> local_batch;
@@ -80,7 +80,7 @@ void local_rollout(int worker_id, ThreadSafeReplayBuffer &buffer,
       state = next_state;
       action = next_action;
     }
-    local_agent.decay_epsilon(0.99);
+    local_agent.decay_epsilon();
 
     // Lock mutex and push to buffer
     if (!local_batch.empty()) {

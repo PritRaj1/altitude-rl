@@ -12,15 +12,25 @@
 using namespace std;
 
 int main() {
-  MarsLanderEnv env;
-  TDtype td_type = TDtype::QLearning;
+  double ALPHA = 0.001;
+  double GAMMA = 1.0;
+  double EPSILON = 1.0;
+  double DECAY = 0.99;
 
-  Agent global_agent(0.001, 1.0, 1.0, env);
-  ThreadSafeReplayBuffer replay_buffer;
-  atomic<bool> training_active(true);
+  double Kp_vel = 350.0;
+  double Ki_vel = 0.0;
+  double Kd_vel = 80.0;
+  double Kp_alt = 0.12;
 
   const int NUM_THREADS = 4;
   const int EPISODES_PER_WORKER = 2000000;
+
+  MarsLanderEnv env;
+  TDtype td_type = TDtype::QLearning;
+
+  Agent global_agent(ALPHA, GAMMA, EPSILON, DECAY, env);
+  ThreadSafeReplayBuffer replay_buffer;
+  atomic<bool> training_active(true);
 
   jthread learner_thread(global_optim, ref(global_agent), ref(replay_buffer),
                          ref(training_active), td_type);
@@ -54,7 +64,7 @@ int main() {
   cout << "Logged to q_learning.csv, starting PID.";
 
   env.reset();
-  CascadedController cascaded_pid(-1.5, 350.0, 0.0, 80.0, 0.12, env);
+  CascadedController cascaded_pid(0.0, Kp_vel, Ki_vel, Kd_vel, Kp_alt, env);
   auto pid_controller = [&cascaded_pid](const LanderState &s) -> double {
     return cascaded_pid.action(s);
   };

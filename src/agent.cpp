@@ -6,8 +6,8 @@
 #include <cstdlib>
 #include <limits>
 
-Agent::Agent(double a, double g, double e, const MarsLanderEnv &env)
-    : alpha(a), gamma(g), epsilon(e) {
+Agent::Agent(double a, double g, double e, double d, const MarsLanderEnv &env)
+    : alpha(a), gamma(g), epsilon(e), decay(d) {
   for (int i = 0; i < NUM_ACTIONS; ++i) {
     double fraction = static_cast<double>(i) / (NUM_ACTIONS - 1);
     action_space.push_back(fraction * env.MAX_THRUST);
@@ -94,9 +94,9 @@ void Agent::update(TDtype type, const LanderState &state, int action_idx,
       alpha * (reward + gamma * target_future_q - q_table[current_q_idx]);
 }
 
-void Agent::decay_epsilon(double factor) {
-  epsilon = max(0.1, epsilon * factor);
-}
+void Agent::decay_epsilon() { epsilon = max(0.1, epsilon * decay); }
+
+Agent Agent::clone() const { return *this; }
 
 void Agent::sync_from(const Agent &other) {
   this->q_table = other.q_table;
