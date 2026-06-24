@@ -36,15 +36,18 @@ double CascadedController::pid(double err) {
 
 double CascadedController::action(const LanderState &state) {
 
-  // Outer guidance loop (altitude -> velocity)
-  double command_velocity = -Kp_alt * state.altitude;
-  command_velocity = max(-20.0, min(command_velocity, target));
+  // Outer loop: energy-based target velocity
+  double command_velocity = -sqrt(max(0.0, 2.0 * env.MARS_G * state.altitude));
+  command_velocity = ::max(command_velocity, -20.0);
 
   double err = command_velocity - state.velocity;
   double pid_force = pid(err);
 
-  double current_weight = (env.DRY_MASS + state.fuel) * env.MARS_G;
-  double total_thrust = current_weight + pid_force;
+  double mass = env.DRY_MASS + state.fuel;
+  double gravity_force = mass * env.MARS_G;
+
+  double total_thrust = gravity_force + pid_force;
+  total_thrust = clamp(total_thrust, 0.0, env.MAX_THRUST);
 
   if (state.fuel <= 0.0) {
     total_thrust = 0.0;

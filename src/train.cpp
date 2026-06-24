@@ -49,16 +49,18 @@ void ThreadSafeReplayBuffer::deactivate(atomic<bool> &training_active) {
 }
 
 void local_rollout(int worker_id, ThreadSafeReplayBuffer &buffer,
-                   const atomic<bool> &training_active, int num_episodes) {
+                   Agent &global_agent, const atomic<bool> &training_active,
+                   int num_episodes) {
   srand(0 + worker_id);
   MarsLanderEnv env;
-  Agent local_agent(0.01, 1.0, 1.0, env);
+  Agent local_agent(0.001, 1.0, 1.0, env);
 
   // Pre-allocate temporary cache on this thread
   vector<Experience> local_batch;
   local_batch.reserve(256);
 
   for (int ep = 0; ep < num_episodes && training_active.load(); ++ep) {
+    local_agent.sync_from(global_agent);
     env.reset();
     LanderState state = env.get_state();
     int action = local_agent.choose_action(state);
@@ -68,17 +70,17 @@ void local_rollout(int worker_id, ThreadSafeReplayBuffer &buffer,
       env.step(thrust);
 
       LanderState next_state = env.get_state();
-      double reward = env.calculate_reward(thrust);
+      double reward = env.calculate_reward(state, thrust);
       int next_action = local_agent.choose_action(next_state);
 
-      // Push to private local memory (Zero lock contention here!)
+      // Push to private local memory
       Experience item = {state, action, reward, next_state, next_action};
       local_batch.push_back(item);
 
       state = next_state;
       action = next_action;
     }
-    local_agent.decay_epsilon(0.999);
+    local_agent.decay_epsilon(0.99);
 
     // Lock mutex and push to buffer
     if (!local_batch.empty()) {

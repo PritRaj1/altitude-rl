@@ -20,9 +20,14 @@ void log2csv(LanderController controller, const string &filename) {
   double cumulative_reward = 0.0;
   while (true) {
     double thrust = controller(state);
-    double reward = env.calculate_reward(thrust);
+    LanderState prev_state = state;
+    env.step(thrust);
+
+    double reward = env.calculate_reward(prev_state, thrust);
     cumulative_reward += reward;
     bool terminal = env.is_terminal();
+    state = env.get_state();
+    step++;
 
     csv_file << step << "," << state.altitude << "," << state.velocity << ","
              << state.fuel << "," << thrust << "," << reward << ","
@@ -31,10 +36,6 @@ void log2csv(LanderController controller, const string &filename) {
     if (terminal) {
       break;
     }
-
-    env.step(thrust);
-    state = env.get_state();
-    step++;
   }
 
   csv_file.close();

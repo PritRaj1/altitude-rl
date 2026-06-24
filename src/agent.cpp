@@ -98,6 +98,11 @@ void Agent::decay_epsilon(double factor) {
   epsilon = max(0.1, epsilon * factor);
 }
 
+void Agent::sync_from(const Agent &other) {
+  this->q_table = other.q_table;
+  this->epsilon = other.epsilon;
+}
+
 void Agent::set_q_table(const vector<double> &new_table) {
   q_table = new_table;
 }

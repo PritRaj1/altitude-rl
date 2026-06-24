@@ -31,6 +31,7 @@ public:
   void deactivate(std::atomic<bool> &training_active);
 };
 void local_rollout(int worker_id, ThreadSafeReplayBuffer &buffer,
+                   Agent &global_agent,
                    const std::atomic<bool> &training_active, int num_episodes);
 void global_optim(Agent &global_agent, ThreadSafeReplayBuffer &buffer,
                   const std::atomic<bool> &training_active, TDtype type);

@@ -13,9 +13,9 @@ using namespace std;
 
 int main() {
   MarsLanderEnv env;
-  TDtype td_type = TDtype::QLearning;
+  TDtype td_type = TDtype::SARSA;
 
-  Agent global_agent(0.1, 1.0, 1.0, env);
+  Agent global_agent(0.001, 1.0, 1.0, env);
   ThreadSafeReplayBuffer replay_buffer;
   atomic<bool> training_active(true);
 
@@ -28,7 +28,8 @@ int main() {
   vector<jthread> workers;
   for (int i = 0; i < NUM_THREADS; ++i) {
     workers.emplace_back(local_rollout, i, ref(replay_buffer),
-                         ref(training_active), EPISODES_PER_WORKER);
+                         ref(global_agent), ref(training_active),
+                         EPISODES_PER_WORKER);
   }
 
   for (auto &w : workers) {
@@ -48,12 +49,12 @@ int main() {
     int action = global_agent.choose_action(s, true); // true = pure greedy
     return global_agent.get_thrust(action);
   };
-  log2csv(rl_controller, "q_learning.csv");
+  log2csv(rl_controller, "sarsa.csv");
 
   cout << "Logged to q_learning.csv, starting PID.";
 
   env.reset();
-  CascadedController cascaded_pid(-1.5, 250.0, 5.0, 40.0, 0.40, env);
+  CascadedController cascaded_pid(-1.5, 350.0, 0.0, 80.0, 0.12, env);
   auto pid_controller = [&cascaded_pid](const LanderState &s) -> double {
     return cascaded_pid.action(s);
   };

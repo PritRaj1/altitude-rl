@@ -10,7 +10,7 @@ struct LanderState {
 class MarsLanderEnv {
 private:
   LanderState state;
-  const double FUEL_BURN_RATE = 0.0001;
+  const double FUEL_BURN_RATE = 0.001;
   const double MARS_AIR_DENSITY = 0.02;
   const double DRAG_COEFF = 0.8;
   const double AREA_CROSS_SECTION = 5.0;
@@ -26,5 +26,5 @@ public:
   LanderState get_state() const;
   bool is_terminal() const;
   void step(double thrust);
-  double calculate_reward(double thrust) const;
+  double calculate_reward(const LanderState &prev_state, double thrust) const;
 };
