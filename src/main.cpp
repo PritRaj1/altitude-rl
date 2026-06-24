@@ -20,7 +20,7 @@ int main() {
   atomic<bool> training_active(true);
 
   const int NUM_THREADS = 4;
-  const int EPISODES_PER_WORKER = 100000;
+  const int EPISODES_PER_WORKER = 1000000;
 
   jthread learner_thread(global_optim, ref(global_agent), ref(replay_buffer),
                          ref(training_active), td_type);

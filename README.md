@@ -36,7 +36,7 @@ void global_optim(
 
 ### Thread guards
 
-Threads are locked with `std::mutex` & `std::lock_guard` / `std::unique_lock` so only one worker can modify the shared queue's pointers at any instant:
+Threads are locked with `std::mutex` & `std::lock_guard` / `std::unique_lock` so only one worker can modify the shared queue's pointers at any insreplay_buffer.deactivate(training_active);tant:
 
 ```c++
 // train.hpp
@@ -48,7 +48,8 @@ private:
   static constexpr size_t MAX_SIZE = 500;
 
 public:
-  void push(const Experience &exp);
+  void push_batch(const vector<Experience> &exp, std::atomic<bool> &training_active); // push to queue in episodic batches to reduce amount of sync required
   bool pop(Experience &exp, const std::atomic<bool> &training_active);
+    void deactivate(std::atomic<bool> &training_active); // prevents lost wake up race condition by waking up any stalled workers
 };
 ```
