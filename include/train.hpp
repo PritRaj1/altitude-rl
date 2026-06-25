@@ -22,7 +22,7 @@ private:
   std::queue<Experience> buffer;
   std::mutex mtx;
   std::condition_variable cv;
-  static constexpr size_t MAX_SIZE = 50000;
+  static constexpr size_t MAX_SIZE = 5000;
 
 public:
   void push_batch(const std::vector<Experience> &batch,

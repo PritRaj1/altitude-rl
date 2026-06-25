@@ -22,11 +22,11 @@ int main() {
   double Kd_vel = 80.0;
   double Kp_alt = 0.12;
 
-  const int NUM_THREADS = 4;
-  const int EPISODES_PER_WORKER = 2000000;
+  const int NUM_THREADS = 8;
+  const int EPISODES_PER_WORKER = 1000000;
+  TDtype td_type = TDtype::QLearning;
 
   MarsLanderEnv env;
-  TDtype td_type = TDtype::QLearning;
 
   Agent global_agent(ALPHA, GAMMA, EPSILON, DECAY, env);
   ThreadSafeReplayBuffer replay_buffer;

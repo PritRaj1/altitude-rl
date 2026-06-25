@@ -21,13 +21,13 @@ private:
                           // NUM_ACT + action_idx]
 
   // Discretisation
-  const int NUM_ACTIONS = 10;
-  const double MAX_ALTITUDE = 100;
-  const double dALT = 5.0; // Bucket size
+  const int NUM_ACTIONS = 20;
+  const double MAX_ALTITUDE = 200;
+  const double dALT = 2.0; // Bucket size
   const int NUM_ALT_BUCKETS = static_cast<int>(MAX_ALTITUDE / dALT) + 1;
-  const double MIN_VEL = -25.0;
+  const double MIN_VEL = -30.0;
   const double MAX_VEL = 10.0;
-  const double dVEL = 0.1; // Bucket size
+  const double dVEL = 1.0; // Bucket size
   const int NUM_VEL_BUCKETS = static_cast<int>((MAX_VEL - MIN_VEL) / dVEL) + 1;
 
   int get_alt_idx(double altitude) const;

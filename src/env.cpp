@@ -41,21 +41,16 @@ void MarsLanderEnv::step(double thrust) {
   }
 }
 
-double potential(const LanderState &s) {
-  return -(0.05 * s.altitude) - (0.5 * abs(s.velocity));
-}
-
 double MarsLanderEnv::calculate_reward(const LanderState &prev_state,
                                        double thrust) const {
-  double reward = potential(state) - potential(prev_state);
-  reward -= 0.01 * thrust;
+  // Progress
+  double reward = 5.0 * (prev_state.altitude - state.altitude);
+
+  reward -= 0.05 * abs(state.velocity); // separate v penalising
+  reward -= 0.0001 * thrust;            // fuel
 
   if (is_terminal()) {
-    if (abs(state.velocity) < 5.0) {
-      reward += 1000.0;
-    } else {
-      reward -= 1000.0;
-    }
+    reward += (abs(state.velocity) < 5.0) ? 1000.0 : -1000.0;
   }
 
   return reward;
