@@ -36,7 +36,7 @@ void global_optim(
 
 ### Thread guards
 
-Threads are locked with `std::mutex` & `std::lock_guard` / `std::unique_lock` so only one worker can modify the shared queue's pointers at any insreplay_buffer.deactivate(training_active);tant:
+Threads are locked with `std::mutex` & `std::lock_guard` / `std::unique_lock` so only one worker can modify the shared queue's pointers at any instant:
 
 ```c++
 // train.hpp
