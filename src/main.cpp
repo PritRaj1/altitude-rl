@@ -24,7 +24,7 @@ int main() {
 
   const int NUM_THREADS = 8;
   const int EPISODES_PER_WORKER = 50000;
-  TDtype td_type = TDtype::QLearning;
+  TDtype td_type = TDtype::SARSA;
 
   MarsLanderEnv env;
 
@@ -59,9 +59,9 @@ int main() {
     int action = global_agent.choose_action(s, true); // true = pure greedy
     return global_agent.get_thrust(action);
   };
-  log2csv(rl_controller, "q_learning.csv");
+  log2csv(rl_controller, "sarsa.csv");
 
-  cout << "Logged to q_learning.csv, starting PID.";
+  cout << "Logged to sarsa.csv, starting PID.";
 
   env.reset();
   CascadedController cascaded_pid(0.0, Kp_vel, Ki_vel, Kd_vel, Kp_alt, env);

@@ -26,5 +26,5 @@ public:
   LanderState get_state() const;
   bool is_terminal() const;
   void step(double thrust);
-  double calculate_reward(const LanderState &prev_state, double thrust) const;
+  double calculate_reward() const;
 };

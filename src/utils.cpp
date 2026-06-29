@@ -20,10 +20,9 @@ void log2csv(LanderController controller, const string &filename) {
   double cumulative_reward = 0.0;
   while (true) {
     double thrust = controller(state);
-    LanderState prev_state = state;
     env.step(thrust);
 
-    double reward = env.calculate_reward(prev_state, thrust);
+    double reward = env.calculate_reward();
     cumulative_reward += reward;
     bool terminal = env.is_terminal();
     state = env.get_state();
