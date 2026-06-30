@@ -8,7 +8,7 @@ The approach is presented [here](https://arxiv.org/abs/1803.00933):
 
 ### Producer
 
-Runs environments with local agents choosing actions, pushing experiences to a thread-safe queue:
+Multiple threads run environments with local agents choosing actions, pushing experiences to a thread-safe queue:
 
 ```c++
 // train.cpp

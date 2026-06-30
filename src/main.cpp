@@ -12,7 +12,7 @@
 using namespace std;
 
 int main() {
-  double ALPHA = 0.001;
+  double ALPHA = 0.5;
   double GAMMA = 1.0;
   double EPSILON = 1.0;
   double DECAY = 0.99999;
@@ -23,7 +23,7 @@ int main() {
   double Kp_alt = 0.12;
 
   const int NUM_THREADS = 8;
-  const int EPISODES_PER_WORKER = 10000;
+  const int EPISODES_PER_WORKER = 100000;
   TDtype td_type = TDtype::QLearning;
 
   MarsLanderEnv env;
@@ -61,7 +61,7 @@ int main() {
   };
   log2csv(rl_controller, "q_learning.csv");
 
-  cout << "Logged to q_leaning.csv, starting PID.";
+  cout << "Logged to q_learning.csv, starting PID.";
 
   env.reset();
   CascadedController cascaded_pid(0.0, Kp_vel, Ki_vel, Kd_vel, Kp_alt, env);
