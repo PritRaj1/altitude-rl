@@ -3,6 +3,8 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
+#include <shared_mutex>
 #include <vector>
 
 using namespace std;
@@ -11,6 +13,8 @@ enum class TDtype { QLearning, SARSA };
 
 class Agent {
 private:
+  mutable shared_mutex agent_mtx;
+
   double alpha;
   double gamma;
   double epsilon;
@@ -37,6 +41,7 @@ private:
 public:
   Agent(double alpha, double gamma, double epsilon, double decay,
         const MarsLanderEnv &env);
+  Agent(const Agent &other);
   ~Agent() = default;
 
   int choose_action(const LanderState &state, bool eval = false);

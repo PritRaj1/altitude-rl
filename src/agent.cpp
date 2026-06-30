@@ -5,7 +5,10 @@
 #include <cmath>
 #include <cstdlib>
 #include <limits>
+#include <mutex>
+#include <shared_mutex>
 
+// Init from params
 Agent::Agent(double a, double g, double e, double d, const MarsLanderEnv &env)
     : alpha(a), gamma(g), epsilon(e), decay(d) {
   for (int i = 0; i < NUM_ACTIONS; ++i) {
@@ -16,6 +19,14 @@ Agent::Agent(double a, double g, double e, double d, const MarsLanderEnv &env)
   // Contiguous array for Q
   size_t total_elements = NUM_ALT_BUCKETS * NUM_VEL_BUCKETS * NUM_ACTIONS;
   q_table.resize(total_elements, 0.0);
+}
+
+// thread-safe copy
+Agent::Agent(const Agent &other)
+    : alpha(other.alpha), gamma(other.gamma), epsilon(other.epsilon),
+      decay(other.decay), action_space(other.action_space) {
+  std::shared_lock<std::shared_mutex> lock(other.agent_mtx);
+  q_table = other.q_table;
 }
 
 int Agent::get_alt_idx(double altitude) const {
@@ -69,6 +80,8 @@ int Agent::choose_action(const LanderState &state, bool eval) {
 void Agent::update(TDtype type, const LanderState &state, int action_idx,
                    double reward, const LanderState &next_state,
                    int next_action_idx) {
+  std::unique_lock<std::shared_mutex> write_lock(agent_mtx);
+
   int alt_idx = get_alt_idx(state.altitude);
   int vel_idx = get_vel_idx(state.velocity);
   int current_q_idx = get_q_idx(alt_idx, vel_idx, action_idx);
@@ -96,9 +109,10 @@ void Agent::update(TDtype type, const LanderState &state, int action_idx,
 
 void Agent::decay_epsilon() { epsilon = max(0.1, epsilon * decay); }
 
-Agent Agent::clone() const { return *this; }
+Agent Agent::clone() const { return Agent(*this); }
 
 void Agent::sync_from(const Agent &other) {
+  std::shared_lock<std::shared_mutex> read_lock(other.agent_mtx);
   this->q_table = other.q_table;
   this->epsilon = other.epsilon;
 }
