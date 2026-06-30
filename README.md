@@ -43,7 +43,7 @@ Threads are locked with `std::mutex` & `std::lock_guard` / `std::unique_lock` so
 class ThreadSafeReplayBuffer {
 private:
   std::queue<Experience> buffer;
-  std::mutex mtx;
+  std::mutex mtx; // protect queue
   std::condition_variable cv; // Freeze global optimizer until workers push experiences
   static constexpr size_t MAX_SIZE = 500;
 
@@ -53,3 +53,8 @@ public:
     void deactivate(std::atomic<bool> &training_active); // prevents lost wake up race condition by waking up any stalled workers
 };
 ```
+
+To prevent race conditions between local agent syncing and global agent updating, `std::shared_mutex` (C++ 20) is used:
+
+- `std::shared_lock` allows threads to read the global Q-table simultaneously without blocking each other
+- `std::unique_lock` locks access to the optimizer during weight updates, so no worker is reading a partially updated table
