@@ -17,7 +17,7 @@ private:
 
   // Reward amplitudes
   const double K_alt = 1.0;
-  const double K_vel = 0.05;
+  const double K_vel = 0.1;
   const double K_fuel = 0.00001;
 
 public:

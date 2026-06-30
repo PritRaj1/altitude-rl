@@ -12,19 +12,19 @@
 using namespace std;
 
 int main() {
-  double ALPHA = 0.5;
+  double ALPHA = 0.1;
   double GAMMA = 1.0;
   double EPSILON = 1.0;
-  double DECAY = 0.99999;
+  double DECAY = 0.999;
 
   double Kp_vel = 350.0;
   double Ki_vel = 0.0;
   double Kd_vel = 80.0;
   double Kp_alt = 0.12;
 
-  const int NUM_THREADS = 8;
+  const int NUM_THREADS = 16;
   const int EPISODES_PER_WORKER = 100000;
-  TDtype td_type = TDtype::QLearning;
+  TDtype td_type = TDtype::SARSA;
 
   MarsLanderEnv env;
 
@@ -59,9 +59,9 @@ int main() {
     int action = global_agent.choose_action(s, true); // true = pure greedy
     return global_agent.get_thrust(action);
   };
-  log2csv(rl_controller, "q_learning.csv");
+  log2csv(rl_controller, "sarsa.csv");
 
-  cout << "Logged to q_learning.csv, starting PID.";
+  cout << "Logged to sarsa.csv, starting PID.";
 
   env.reset();
   CascadedController cascaded_pid(0.0, Kp_vel, Ki_vel, Kd_vel, Kp_alt, env);
