@@ -8,7 +8,7 @@ The approach is presented [here](https://arxiv.org/abs/1803.00933):
 
 ### Producer
 
-Runs environmemts within with local agents choosing actions, pushing experiences to a thread-safe queue:
+Runs environments with local agents choosing actions, pushing experiences to a thread-safe queue:
 
 ```c++
 // train.cpp
@@ -50,7 +50,7 @@ private:
 public:
   void push_batch(const vector<Experience> &exp, std::atomic<bool> &training_active); // push to queue in episodic batches to reduce amount of sync required
   bool pop(Experience &exp, const std::atomic<bool> &training_active);
-    void deactivate(std::atomic<bool> &training_active); // prevents lost wake up race condition by waking up any stalled workers
+  void deactivate(std::atomic<bool> &training_active); // prevents lost wake up race condition by waking up any stalled workers
 };
 ```
 
