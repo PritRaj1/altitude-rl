@@ -70,7 +70,7 @@ void local_rollout(int worker_id, ThreadSafeReplayBuffer &buffer,
       env.step(thrust);
 
       LanderState next_state = env.get_state();
-      double reward = env.calculate_reward();
+      double reward = env.calculate_reward(state, thrust);
       int next_action = local_agent.choose_action(next_state);
 
       // Push to private local memory

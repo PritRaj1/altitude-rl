@@ -15,6 +15,11 @@ private:
   const double DRAG_COEFF = 0.8;
   const double AREA_CROSS_SECTION = 5.0;
 
+  // Reward amplitudes
+  const double K_alt = 1.0;
+  const double K_vel = 0.05;
+  const double K_fuel = 0.00001;
+
 public:
   MarsLanderEnv() = default;
   const double MARS_G = -3.71;
@@ -26,5 +31,5 @@ public:
   LanderState get_state() const;
   bool is_terminal() const;
   void step(double thrust);
-  double calculate_reward() const;
+  double calculate_reward(const LanderState &prev_state, double thrust) const;
 };

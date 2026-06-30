@@ -41,12 +41,16 @@ void MarsLanderEnv::step(double thrust) {
   }
 }
 
-double MarsLanderEnv::calculate_reward() const {
+double MarsLanderEnv::calculate_reward(const LanderState &prev_state,
+                                       double thrust) const {
 
-  double reward = 0.0;
+  double reward = K_alt * (prev_state.altitude - state.altitude);
+  reward -= K_vel * fabs(state.velocity);
+  reward -= K_fuel * thrust;
+
   if (is_terminal()) {
     double v = fabs(state.velocity);
-    reward += 1000.0 * exp(-0.01 * v * v);
+    reward += 1000.0 * exp(-0.0001 * v * v);
   }
 
   return reward;
